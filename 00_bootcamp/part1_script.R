@@ -87,11 +87,13 @@ bexar_inflow %>%
 v19_acs <- load_variables(2019, "acs5", cache = TRUE)
 View(v19_acs)
 
-install.packages("remotes")
-remotes::install_github("SafeGraphInc/SafeGraphR")
+#install.packages("remotes")
+#remotes::install_github("SafeGraphInc/SafeGraphR")
 
 library(SafeGraphR)
-aa<-read_patterns("2022-01-11-18-2021-12-patterns.csv",
+unzip(zipfile ="00_bootcamp/2022-01-11-18-2021-12-patterns.zip",exdir = '00_bootcamp')
+
+aa<-read_patterns("00_bootcamp/2022-01-11-18-2021-12-patterns.csv",
                   select = c('placekey',
                              'location_name',
                              'street_address',
@@ -105,6 +107,7 @@ aa<-read_patterns("2022-01-11-18-2021-12-patterns.csv",
                              'normalized_visits_by_total_visits',
                              'normalized_visits_by_total_visitors'))
 View(aa)
+#file.remove("00_bootcamp/2022-01-11-18-2021-12-patterns.csv")
 
 aa[,GEOID:=substr(poi_cbg,1,11)]
 aa[duplicated(GEOID),.N]
@@ -134,7 +137,7 @@ ggplot(data = bexar_medincome[bexar_medincome$distance_from_home<80000,],
 
 bexar_medincome%>%
   mapdeck(token=token)%>%
-  add_polygon(fill_colour = 'estimate',legend = T)
+  add_polygon(fill_colour = 'raw_visitor_counts',legend = T)
 
 
 #---- 2.2 SA Tomorrow Westside Plan ----
