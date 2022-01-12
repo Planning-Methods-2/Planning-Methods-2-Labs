@@ -30,5 +30,11 @@ ggplot(new_housing,aes(x=date,y=N))+geom_line()
 nh2<-bb[,.N,by=.(yy,mm,`Permit Type`)]
 nh2[,date:=as.Date(paste0(yy,"-",mm,"-","01"))]
 
-ggplot(nh2,aes(x=date,y=N))+geom_line()+facet_wrap(~`Permit Type`,scales = "free_y")
-ggplot(nh2[yy==2021],aes(x=date,y=N))+geom_line()+facet_wrap(~`Permit Type`,scales = "free_y")
+
+ggplot(nh2[yy==2021],aes(x=date,y=N))+
+  geom_bar(stat = "identity")+
+  facet_wrap(~`Permit Type`,scales = "free_y")+
+  labs(title = "CoSA Building Permits visualization", subtitle = "Number of applications submitted by date submitted", caption = "Source: https://data.sanantonio.gov/dataset/building-permits")
+
+
+
