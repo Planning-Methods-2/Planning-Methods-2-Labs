@@ -83,84 +83,47 @@ bexar_inflow %>%
 
 
 
-#---- 2.2 Mobility
+#---- 2.2 Travel time to work
 v19_acs <- load_variables(2019, "acs5", cache = TRUE)
 View(v19_acs)
 
-#install.packages("remotes")
-#remotes::install_github("SafeGraphInc/SafeGraphR")
+bexar_TTW <- get_acs(
+  year = 2019,
+  geography = "tract",
+  state = "TX",
+  county = "Bexar",
+  variables = c(ttw_0_5 = "B03002_004",
+                ttw_5_9 = "B08303_003",
+                ttw_10_14 = "B08303_004",
+                ttw_15_19 = "B08303_005",
+                ttw_20_24 = "B08303_006",
+                ttw_25_29 = "B08303_007",
+                ttw_30_34 = "B08303_008",
+                ttw_35_39 = "B08303_009",
+                ttw_40_44 = "B08303_010",
+                ttw_45_59 = "B08303_011"),
+                summary_var = "B08303_001",
+  geometry = TRUE)%>%
+  mutate(percent = 100 * (estimate / summary_est)) # Code extracted and adapted from Walker (2021) 
 
-library(SafeGraphR)
-unzip(zipfile ="00_bootcamp/2022-01-11-18-2021-12-patterns.zip",exdir = '00_bootcamp')
+# Choroplet map with distribution of racial concentrations
+#install.packages("tmap")
+library(tmap)
 
-aa<-read_patterns("00_bootcamp/2022-01-11-18-2021-12-patterns.csv",
-                  select = c('placekey',
-                             'location_name',
-                             'street_address',
-                             'city',
-                             'region',
-                             'postal_code',
-                             'poi_cbg',
-                             'raw_visit_counts',
-                             'raw_visitor_counts',
-                             'distance_from_home',
-                             'normalized_visits_by_total_visits',
-                             'normalized_visits_by_total_visitors'))
-View(aa)
-#file.remove("00_bootcamp/2022-01-11-18-2021-12-patterns.csv")
+tm_shape(bexar_TTW,
+         projection = sf::st_crs(26915)) + 
+  tm_facets(by = "variable", scale.factor = 4) + 
+  tm_fill(col = "percent",
+          style = "jenks",
+          n = 5,
+          palette = "Blues",
+          title = "Travel Time to Work (TTW)\n Percentage of total trips by TTW") + 
+  tm_layout(bg.color = "grey", 
+            legend.outside = T,
+            panel.label.bg.color = "white")
 
-aa[,GEOID:=substr(poi_cbg,1,11)]
-aa[duplicated(GEOID),.N]
-aa<-aa[!duplicated(GEOID),]
-
-bexar_medincome <- get_acs(geography = "tract", variables = "B19013_001",
-                           state = "TX", county = "Bexar", geometry = TRUE)
-head(bexar_medincome)
-
-bexar_medincome<-merge(bexar_medincome,aa,by='GEOID',all.x=T)
-View(bexar_medincome)
-
-#basic visualization
-library(ggplot2)
-
-ggplot(data = bexar_medincome)+
-  geom_point(aes(x = raw_visitor_counts, y= distance_from_home))
-
-ggplot(data = bexar_medincome[bexar_medincome$distance_from_home<80000,])+
-  geom_point(aes(x = raw_visitor_counts, y= distance_from_home))
-
-ggplot(data = bexar_medincome[bexar_medincome$distance_from_home<80000,],
-       aes(y = raw_visitor_counts, x= distance_from_home,size=estimate,colour=estimate))+
-  geom_point()+
-  geom_smooth(method = 'loess')
+bexar_TTW<- get_acs(geography = "tract", variables = "B08013_001",
+           state = "TX", county = "Bexar", geometry = TRUE)
 
 
-bexar_medincome%>%
-  mapdeck(token=token)%>%
-  add_polygon(fill_colour = 'raw_visitor_counts',legend = T)
 
-
-#---- 2.2 SA Tomorrow Westside Plan ----
-
-library(sf)
-# download source: https://data.sanantonio.gov/dataset/satomorrowsubareaplans 
-
-#Unziping and reading the data
-unzip("SATomorrowSubAreaPlans-shp.zip",exdir = "SATomorrowSubAreaPlans-shp")
-SAT<-read_sf('SATomorrowSubAreaPlans-shp/SATomorrowSubAreaPlans.shp')
-
-
-#exploring the data
-plot(SAT)
-names(SAT)
-table(SAT$Phase,SAT$PlanType)
-
-mapdeck(SAT,token = token)%>%
-  add_polygon(fill_colour = "PlanType")
-
-
-bike_facilities_map_url<-"https://opendata-cosagis.opendata.arcgis.com/datasets/55234cc46b954f69a659711b240bdf59_0.zip?outSR=%7B%22latestWkid%22%3A2278%2C%22wkid%22%3A102740%7D"
-
-download.file(url = bike_facilities_map_url,destfile = "Bikes.zip")
-
-unzip(zipfile = "bike_facilities_map.zip")
