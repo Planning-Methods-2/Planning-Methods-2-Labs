@@ -61,8 +61,8 @@ print(r.LifeCycleSavings.head())
 print(LC.head())
 LC.dtypes
 LC.describe()
-LC2 = LC.loc[:,["rn","sr","dpi"]]
-LC.loc[LC.loc[:,"sr"]>10,"sr"]
+LC2 = LC.loc[:,["sr","dpi"]]
+LC2.loc[LC2.loc[:,"sr"]>10,"sr"]
 ```
 
 
@@ -72,7 +72,7 @@ Finnaly, once all python code has been runned, you can easily bring that output 
 
 ```{r back to R, echo=TRUE}
 library(ggplot2)
-ggplot(py$LC2,aes(x=reorder(rn,dpi),y=dpi))+geom_bar(stat = 'identity')+coord_flip()
+ggplot(py$LC2,aes(x=reorder(row.names(py$LC2),dpi),y=dpi))+geom_bar(stat = 'identity')+coord_flip()
 ```
 
 # 2. Turning the R-Console as a python-Console
