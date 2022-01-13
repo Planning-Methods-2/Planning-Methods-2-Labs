@@ -1,0 +1,98 @@
+---
+title: "Integrating Python and R"
+output: html_document
+author: Esteban López Ochoa
+inst: Master in Science in Urban Planning, UTSA
+---
+
+# Python in R Markdown
+
+In R many things can be done, but there are some functionalities that python is just better at. Another reason to include `python` whinin `R`, is that some users might know to do (or be more comfortable doing) something in `python`, but other things in `R`. This script provides a short introduction on how to run python within R-Studio.
+
+For example, bellow there is some R code to produce a graph within R.
+
+```{r `Example 1: Data in R`}
+data("LifeCycleSavings")
+summary(LifeCycleSavings)
+?LifeCycleSavings
+head(LifeCycleSavings)
+#install.packages('ggplot2')
+library(ggplot2)
+typeof(LifeCycleSavings); class(LifeCycleSavings)
+LifeCycleSavings$rn<-row.names(LifeCycleSavings)
+ggplot(LifeCycleSavings)+geom_bar(aes(x = reorder(rn,sr),y=sr),stat = 'identity')+coord_flip()
+```
+
+However there might be times that is desirable to bring some python functionalities to your `R` workflow. In this cases, there are several ways to do so.
+
+# 1. Python in R-Studio and RMarkdown using the `reticulate` package
+
+The package `reticulate` provides an easier way to integrate python in R. The basic set-up process includes.
+- Installing and loading `reticulate`
+- Checking if python is installed and what version this is
+- Checking the virual and conda environments that are available
+- Checking if the Markdown engine points to the right python version and/or environment
+- Installing python packages
+
+```{r py_setup}
+#install.packages('reticulate')
+library(reticulate)
+repl_python() #turns your R console into a Python Console. If no python is found choose yes to install miniconda
+
+py_discover_config() # info about your python distribution
+conda_list()
+virtualenv_list()
+py_install('pandas') # installs python libraries 
+py_install('matplotlib') # installs python libraries 
+```
+
+### Running python within a `chunk`
+
+The following code shows how python can be runned in a R-Studio `chunk`, in order to do something (in this case a basic use of the pandas and numpy packages that for the sake of the example we will assume it is easier to do in python).
+
+```{python}
+16**0.5
+import math
+math.sqrt(16)
+import pandas as pd
+import numpy as np
+LC = pd.DataFrame(r.LifeCycleSavings)
+print(r.LifeCycleSavings.head())
+print(LC.head())
+LC.dtypes
+LC.describe()
+LC2 = LC.loc[:,["rn","sr","dpi"]]
+LC.loc[LC.loc[:,"sr"]>10,"sr"]
+```
+
+
+### Using python products back in R
+
+Finnaly, once all python code has been runned, you can easily bring that output back to R, and visualize it as you like it. 
+
+```{r back to R, echo=TRUE}
+library(ggplot2)
+ggplot(py$LC2,aes(x=reorder(rn,dpi),y=dpi))+geom_bar(stat = 'identity')+coord_flip()
+```
+
+# 2. Turning the R-Console as a python-Console
+
+The function `repl_python()` is a wrapper that allows turning your R-Console as a python console. This will allow you to run `python` code creating objects in that environment that can later be returned to your `R` environment. For more information visit: https://rstudio.github.io/reticulate/ 
+
+# 3. Sourcing an entire python script in R
+
+Python scripts can have either code processing data, and other programming activities, but can also have functions. For this latte type of needs, sourcing a python script can be quite useful. This can be done by using the function `source_python` in the `reticulate` package. For more information visit: https://rstudio.github.io/reticulate/ 
+
+# 4. Running R within your python distribution 
+
+If you have installed the Anaconda suite. There are two ways in which you can bring R to your python work flow.
+
+## A. Jupyter Notebooks
+
+The `kernel` of a Jypyter Notebook can be switched from the dafault `python` engine to an `R` engine. This can be done by creating an `R` based environment in your python and then, using that environment as the active environment, launching a Jupyter Notebook. For more information visit:
+https://docs.anaconda.com/anaconda/navigator/tutorials/create-r-environment/ 
+
+## B. R-Studio in the Anaconda suite.
+
+This is just a link for opening R-Studio from the Anaconda Navigator.
+Visit: https://docs.anaconda.com/anaconda/navigator/tutorials/create-r-environment/ 
