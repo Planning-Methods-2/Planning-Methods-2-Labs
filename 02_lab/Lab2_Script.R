@@ -130,4 +130,73 @@ usa_arrests$southeast<-factor(usa_arrests$southeast,levels = c(1,0),labels = c("
 
 ggplot(data = usa_arrests,aes(x=Assault,y=Murder, size=UrbanPop)) +
   geom_point()+
-  facet_wrap(~southeast)
+  facet_wrap(southeast~ .)
+
+
+ggplot(data = usa_arrests,aes(x=Assault,y=Murder, size=UrbanPop)) +
+  geom_point()+
+  facet_grid(southeast ~ .)
+
+## ---- Part 3: Visualizing the spatial data ----
+# Administrative boundaries
+
+
+library(leaflet)
+library(tigris)
+
+bexar_county <- counties(state = "TX",cb=T)
+bexar_tracts<- tracts(state = "TX", county = "Bexar",cb=T)
+bexar_blockgps <- block_groups(state = "TX", county = "Bexar",cb=T)
+#bexar_blocks <- blocks(state = "TX", county = "Bexar") takes lots of time
+
+
+# incremental visualization (static)
+
+ggplot()+
+  geom_sf(data = bexar_county)
+
+ggplot()+
+  geom_sf(data = bexar_county[bexar_county$NAME=="Bexar",])
+
+ggplot()+
+  geom_sf(data = bexar_county[bexar_county$NAME=="Bexar",])+
+  geom_sf(data = bexar_tracts)
+
+p1<-ggplot()+
+  geom_sf(data = bexar_county[bexar_county$NAME=="Bexar",],color='blue',fill=NA)+
+  geom_sf(data = bexar_tracts,color='black',fill=NA)+
+  geom_sf(data = bexar_blockgps,color='red',fill=NA)
+
+ggsave(filename = "02_lab/plots/01_static_map.pdf",plot = p1) #saves the plot as a pdf
+
+
+
+# incremental visualization (interactive)
+leaflet(bexar_county) %>%
+  addTiles() %>%
+  addPolygons()
+
+names(table(bexar_county$NAME))
+
+leaflet(bexar_county[bexar_county$NAME=="Bexar",]) %>%
+  addTiles() %>%
+  addPolygons()
+
+leaflet(bexar_county[bexar_county$NAME=="Bexar",]) %>%
+  addTiles() %>%
+  addPolygons(group="county")%>%
+  addPolygons(data=bexar_tracts,group="tracts") %>%
+  addPolygons(data=bexar_blockgps,color = "#444444", weight = 1,group="block groups")
+
+leaflet(bexar_county[bexar_county$NAME=="Bexar",]) %>%
+  addTiles() %>%
+  addPolygons(group="county")%>%
+  addPolygons(data=bexar_tracts,group="tracts") %>%
+  addPolygons(data=bexar_blockgps,color = "#444444", weight = 1,group="block groups") %>%
+  addLayersControl(
+    overlayGroups = c("county", "tracts","block groups"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+
+
