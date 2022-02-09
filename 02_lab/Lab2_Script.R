@@ -147,7 +147,7 @@ library(tigris)
 bexar_county <- counties(state = "TX",cb=T)
 bexar_tracts<- tracts(state = "TX", county = "Bexar",cb=T)
 bexar_blockgps <- block_groups(state = "TX", county = "Bexar",cb=T)
-#bexar_blocks <- blocks(state = "TX", county = "Bexar") takes lots of time
+#bexar_blocks <- blocks(state = "TX", county = "Bexar") #takes lots of time
 
 
 # incremental visualization (static)
