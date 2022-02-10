@@ -22,6 +22,8 @@ library(tigris)
 
 # counties
 texas_counties <- counties(state = "TX",cb=T)
+
+library(ggplot2)
 ggplot()+
   geom_sf(data = texas_counties,fill=NA)+
   geom_sf(data = texas_counties[texas_counties$NAME=="Bexar",],color='blue',fill=NA)
@@ -30,7 +32,8 @@ ggplot()+
 bexar_tracts<- tracts(state = "TX", county = "Bexar",cb=T)
 ggplot()+
   geom_sf(data = bexar_tracts,fill=NA)+
-  geom_sf(data = texas_counties[texas_counties$NAME=="Bexar",],color='blue',fill=NA)
+  geom_sf(data = texas_counties[texas_counties$NAME=="Bexar",],color='blue',fill=NA)+
+  geom_sf(data = bexar_tracts[bexar_tracts$TRACTCE=="190601",],color='red',fill=NA)
   
 #example with census data
 library(tidycensus)
@@ -104,6 +107,7 @@ ggplot()+
   
 
 ##---- 1.3 Lines data
+# download data from: https://data.sanantonio.gov/dataset/bike-facilities1/resource/e9a42ba8-5dfb-4642-ad1d-6b964f475fb8
 
 bike_paths<-st_read(dsn = "04_lab/datasets/Bike_Facilities/Bike_Facilities.shp")
 
@@ -115,6 +119,8 @@ ggplot(bike_paths)+
   geom_sf(color='green')
 
 ##---- 1.4 Raster data
+# example raster mono-layer
+# source: https://cran.r-project.org/web/packages/ForestTools/vignettes/treetop_analysis.html
 
 install.packages("ForestTools")
 library(ForestTools)
@@ -126,7 +132,7 @@ plot(kootenayCHM)
 class(kootenayCHM)
 nlayers(kootenayCHM) # unilayer raster
 
-# example raster
+# example raster multi-layer
 install.packages("satellite")
 library(satellite)
 
