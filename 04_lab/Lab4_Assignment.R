@@ -76,4 +76,4 @@ TIRZ_map2<-aggregate(x = bexar_medincome,by=TIRZ_map,FUN = mean,na.rm=T) # aggre
 ggplot()+
   geom_sf(data=bexar_medincome)+
   geom_sf(data=TIRZ_map2,aes(fill=estimate),colour=NA)
-
+ggsave(filename = "04_lab/my_results/plot_2.pdf")
