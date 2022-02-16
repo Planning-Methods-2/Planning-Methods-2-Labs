@@ -39,9 +39,9 @@ b1000000<-rbinom(n = 100000,size =10000,prob = 0.5)
 
 plot(density(b1000000))
 
+#---- Part 1. Learn how to apply general descriptive statistic metrics ----
 
 # Let's imagine that this is a dataset containing ALL (the population) of air quality data 
-library(data.table)
 
 air_pop<-data.table(datasets::airquality)
 
@@ -72,3 +72,77 @@ air_sample_temp<-sample(air_pop$Temp,size = 50)
 
 plot(density(air_pop$Temp))
 lines(density(air_sample_temp),col='red')
+
+
+#---- Part 3. Learn how to use appropriate visualization methods ----
+# Housing Sales in Chicago
+
+unzip(zipfile = "05_lab/datasets/HSD_sample.csv.zip",exdir = "05_lab/datasets/")
+
+library(data.table)
+chi_hsales<-fread(input = "05_lab/datasets/HSD_sample.csv")
+setkey(chi_hsales,year,month)
+
+#exploring the data
+
+str(chi_hsales)
+
+summary(chi_hsales)
+
+# Descriptive statistics table
+cols<-c("year","month","sqftl","sqftb","age","rooms","bedrooms","bathrooms","aircond")
+DescStats_t1<-chi_hsales[,sapply(X = .SD,FUN = summary),.SDcols=cols]
+
+# Frequency Statistics and Plots
+#What years had more sales?
+library(ggplot2)
+
+chi_hsales[,.N,by=.(year)] 
+
+ggplot(data = chi_hsales)+
+  geom_bar(aes(x=factor(reorder(year,-year))))+
+  coord_flip()
+
+
+# Relational Plots
+# What is the housing size distribution of housing sales before and after 2008?
+
+chi_hsales[,crisis_year:=as.numeric(year>=2008)]
+chi_hsales[,crisis_year:=factor(crisis_year,levels = c(0,1),labels = c("pre-crisis","post-crisis"))]
+
+#density option
+ggplot(data = chi_hsales)+
+  geom_density(aes(x=sqftb,colour=crisis_year))
+
+#boxplot option
+ggplot(data = chi_hsales)+
+  geom_boxplot(aes(y=sqftl,x=crisis_year))
+
+# Did the relationship between price and age changed with the housing crisis?
+
+ggplot(data = chi_hsales)+
+  geom_point(aes(x=age, y=price, color=crisis_year))
+
+ggplot(data = chi_hsales)+
+  geom_density(aes(x=age))+
+  geom_vline(xintercept = c(23,67))
+
+chi_hsales[age>0 & age<=23, age_cuts:="0-23"]
+chi_hsales[age>23 & age<=67, age_cuts:="23-67"]
+chi_hsales[age>67, age_cuts:="67~"]
+
+ggplot(data = chi_hsales)+
+  geom_boxplot(aes(x=crisis_year, y=price, color=crisis_year))+
+  facet_grid(~age_cuts)
+
+
+# Tendency Plots
+#Plot average sales price by month and year in the whole period?
+
+mean_price<-chi_hsales[,.(mean_price=mean(price,na.rm=T)),by=.(year,month)]
+mean_price[,date:=as.Date(paste(year,month,"01",sep = "/"))]
+
+ggplot(data=mean_price,aes(x=date,y=mean_price))+
+  geom_line()+
+  geom_smooth()
+
