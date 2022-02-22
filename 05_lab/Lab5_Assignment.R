@@ -16,7 +16,7 @@
 unzip(zipfile = "datasets/HSD_sample.csv.zip",exdir = "datasets") # same as line 84 in "Lab5Script.R"
 
 library(data.table)
-sales_chicago<-fread(input = "datasets/HSD_sample.csv") # same as line 87 in "Lab5Script.R"
+sales_chicago<-fread(input = "05_lab/datasets/HSD_sample.csv") # same as line 87 in "Lab5Script.R"
 setkey(sales_chicago,year,month)
 
 
@@ -30,7 +30,11 @@ crisis_share[,crisis_year:=factor(crisis,levels = c(0,1),labels = c("pre-crisis"
 
 crisis_share[,percent:=N/sum(N)]
 
-
+#Alternative: answer based on the BQRM, p. 127
+cases<-table(sales_chicago$crisis)
+percent<-prop.table(cases)  
+crisis_share2<-cbind(cases,percent)
+  
 #3. Create a bar plot using the crisis_share object to show the differences between pre and post crisis in the share of sales. Save the graph as `githubuser_plot1.pdf`
 # hint: remember to use stat='identity' argument. Explain why?
 
