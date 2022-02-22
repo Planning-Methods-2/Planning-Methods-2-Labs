@@ -46,6 +46,9 @@ dir.create("04_lab/my_results")
 
 library(ggplot2)
 
+ggplot(data = TIRZ_map, aes(x=Acres))+
+  geom_histogram()
+
 ggplot()+
   geom_histogram(data = TIRZ_map,aes(x=Acres))
 ggsave(filename = "04_lab/my_results/plot_1.pdf")

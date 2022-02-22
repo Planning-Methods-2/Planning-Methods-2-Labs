@@ -15,10 +15,13 @@
 # Law of Large Numbers
 ## More data on something will converge to the mean 
 
-sample(x = 1:6,size = 1) # dice experiment
+mean(sample(x = 1:6,size = 6,replace = T)) # dice experiment
 
+mean(1:6)
 
-v100<-rnorm(n = 100,mean = 0,sd = 1)
+set.seed(12)
+
+v100<-rnorm(n = 100,mean = 30,sd = 15)
 v1000<-rnorm(n = 1000,mean = 0,sd = 1)
 v10000<-rnorm(n = 10000,mean = 0,sd = 1)
 v100000<-rnorm(n = 100000,mean = 0,sd = 1)
@@ -42,7 +45,7 @@ plot(density(b1000000))
 #---- Part 1. Learn how to apply general descriptive statistic metrics ----
 
 # Let's imagine that this is a dataset containing ALL (the population) of air quality data 
-
+library(data.table)
 air_pop<-data.table(datasets::airquality)
 
 
@@ -59,6 +62,7 @@ points(x=min(air_pop$Temp),y=0,col='red')
 points(x=max(air_pop$Temp),y=0,col='blue')
 abline(v=mean(air_pop$Temp),col='green')
 abline(v=quantile(air_pop$Temp,probs = 0.5),col='darkblue')
+abline(v=quantile(air_pop$Temp,probs = 0.25),col='darkgreen')
 
 # library(ggplot2)
 # 
@@ -77,7 +81,7 @@ lines(density(air_sample_temp),col='red')
 #---- Part 3. Learn how to use appropriate visualization methods ----
 # Housing Sales in Chicago
 
-unzip(zipfile = "05_lab/datasets/HSD_sample.csv.zip",exdir = "05_lab/datasets/")
+unzip(zipfile = "datasets/HSD_sample.csv.zip",exdir = "datasets")
 
 library(data.table)
 chi_hsales<-fread(input = "05_lab/datasets/HSD_sample.csv")
@@ -90,9 +94,11 @@ str(chi_hsales)
 summary(chi_hsales)
 
 # Descriptive statistics table
+names(chi_hsales)
 cols<-c("year","month","sqftl","sqftb","age","rooms","bedrooms","bathrooms","aircond")
 DescStats_t1<-chi_hsales[,sapply(X = .SD,FUN = summary),.SDcols=cols]
 
+fwrite(x = DescStats_t1,file = "05_lab/DT.csv")
 # Frequency Statistics and Plots
 #What years had more sales?
 library(ggplot2)
@@ -112,11 +118,11 @@ chi_hsales[,crisis_year:=factor(crisis_year,levels = c(0,1),labels = c("pre-cris
 
 #density option
 ggplot(data = chi_hsales)+
-  geom_density(aes(x=sqftb,colour=crisis_year))
+  geom_density(aes(x=price,colour=crisis_year))
 
 #boxplot option
 ggplot(data = chi_hsales)+
-  geom_boxplot(aes(y=sqftl,x=crisis_year))
+  geom_boxplot(aes(y=price,x=crisis_year))
 
 # Did the relationship between price and age changed with the housing crisis?
 
