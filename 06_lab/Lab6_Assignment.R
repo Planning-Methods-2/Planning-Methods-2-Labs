@@ -12,8 +12,10 @@
 #---- Part 1.
 
 # 1.1 load the same household data used in the Lab6_Script.R file, create the object `HTS`
+library(data.table)
+library(foreign)
 
-
+hts <- data.table(read.spss("06_lab/datasets/HTS.household.10regions.sav",to.data.frame = T))
 
 # 2. Create an object called `HTS_tab` that has the frequency or contingency table for the variables `htype` and `income_cat`
 # Refer to the BQRM book (p.13) if you don't know what the variables mean
@@ -26,12 +28,12 @@ HTS_tab <- table(hts$htype,hts$income_cat)
 chisq.test(HTS_tab,correct = F)
 
 #4. Calculate the Cramer's V coefficient for your Chi-Square test. What conclusions can you draw?
-
+library(vcd)
 assocstats(HTS_tab)
 
 #5. Calculate the pearson correlation coefficient between the variables `veh` and `hhincome`. What can you say about the relationship between these two variables?
 
-cor(hts$veh,hts$hhincome,na.rm=T)
+cor(hts$veh,hts$hhincome,use = "pair")
 
 #6. Calculate the spearman correlation coefficient between the variables `hhsize` and `income_cat`. What can you say about the relationship between these two variables?
 class(hts$income_cat)
