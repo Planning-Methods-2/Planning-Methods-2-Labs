@@ -2,6 +2,7 @@
 library(tidycensus)
 library(data.table)
 
+
 census_api_key("0d539976d5203a96fa55bbf4421110d4b3db3648")# you must acquired your own key at http://api.census.gov/data/key_signup.html
 
 bexar_medincome_20 <- get_acs(geography = "tract", variables = "B19013_001",

@@ -103,9 +103,9 @@ bp_sa_map<-st_transform(x = bp_sa_map,crs = st_crs(bexar_tracts))
 
 ggplot()+
   geom_sf(data = bexar_tracts)+
-  geom_sf(data=bp_sa_map,size=0.05)
+  geom_sf(data=bp_sa_map[bp_sa_map$`PERMIT TYPE`=="Solar - Photovoltaic Permit",],size=0.05)
   
-
+st_join(bp_sa_map,bexar_tracts)
 ##---- 1.3 Lines data
 # download data from: https://data.sanantonio.gov/dataset/bike-facilities1/resource/e9a42ba8-5dfb-4642-ad1d-6b964f475fb8
 
