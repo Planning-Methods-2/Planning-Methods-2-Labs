@@ -66,7 +66,7 @@ library(tidycensus)
 library(tigris)
 
 
-census_api_key("0d539976d5203a96fa55bbf4421110d4b3db3648") #this is mine, type ?census_api_key to get yours
+#type ?census_api_key to get your Census API for full access.
 
 age10 <- get_decennial(geography = "state", 
                        variables = "P013001", 
@@ -172,6 +172,21 @@ ggsave(filename = "02_lab/plots/01_static_map.pdf",plot = p1) #saves the plot as
 
 
 # incremental visualization (interactive)
+
+#install.packages("mapview")
+library(mapview)
+
+mapview(bexar_county)
+
+mapview(bexar_county[bexar_county$NAME=="Bexar",])+
+  mapview(bexar_tracts)
+
+mapview(bexar_county[bexar_county$NAME=="Bexar",])+
+  mapview(bexar_tracts)+
+  mapview(bexar_blockgps)
+
+
+#another way to vizualize this
 leaflet(bexar_county) %>%
   addTiles() %>%
   addPolygons()
