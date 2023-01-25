@@ -9,8 +9,8 @@
 # 2. [60 points] Open the R file "Lab2_Assignment.R" and answer the questions
 
 #---- Q1. write the code to load the dataset "tract_covariates.csv" located under the "datasets" folder in your repository. Create an object called `opportunities` ----
-
-opportunities <- read.csv("02_lab/datasets/tract_covariates.csv")
+library(data.table)
+opportunities <- fread("02_lab/datasets/tract_covariates.csv")
 
 
 #---- Q2. Read and become familiar with the dataset metadata. Next write the code for the following:
@@ -36,23 +36,20 @@ View(opportunities)
 # It is easy to see that out of the ID variables, `tract` is the only variables that change in each row. Hence `tract` is the variable of interest.
 
 
-# Create a new object called `sa_opportunities` that only contains the rows for the San Antonio area (hint: use the `czname` variable). Save the resulting plot as a pdf with the name 'githubusername_p1.pdf'
+# Create a new object called `sa_opportunities` that only contains the rows for the San Antonio area (hint: use the `czname` variable). 
 
-sa_opportunities<-opportunities[opportunities$czname=="San Antonio",]
+sa_opportunities<-opportunities[czname=="San Antonio",]
 
-pdf("02_lab/plots/estebanlp_p1.pdf",height = 8.5, width = 11)
-plot(sa_opportunities)
-dev.off()
 
-# Create a plot that shows the ranking of Annualized job growth rate (ann_avg_job_growth_2004_2013 variable) by census tract (tract variable). Save the resulting plot as a pdf with the name 'githubusername_p2.pdf'
+# Create a plot that shows the ranking of Annualized job growth rate (ann_avg_job_growth_2004_2013 variable) by census tract (tract variable). Save the resulting plot as a pdf with the name 'githubusername_p1.pdf'
 
 library(ggplot2)
-
-ggplot(data = sa_opportunities)+
+setorderv(sa_opportunities,cols = "ann_avg_job_growth_2004_2013", order = -1,na.last = T)
+ggplot(data = sa_opportunities[1:10,])+
   geom_col(aes(y=reorder(tract,ann_avg_job_growth_2004_2013),x=ann_avg_job_growth_2004_2013))
 ggsave(filename = "02_lab/plots/estebanlp_p2.pdf")
 
-# Create a plot that shows the relation between the `frac_coll_plus` and the `hhinc_mean2000` variables, what can you hypothesize from this relation? what is the causality direction? Save the resulting plot as a pdf with the name 'githubusername_p3.pdf'
+# Create a plot that shows the relation between the `frac_coll_plus` and the `hhinc_mean2000` variables, what can you hypothesize from this relation? what is the causality direction? Save the resulting plot as a pdf with the name 'githubusername_p2.pdf'
 
 ggplot(data = sa_opportunities, aes(x=frac_coll_plus2000,y=hhinc_mean2000)) +
   geom_point()+
@@ -61,7 +58,7 @@ ggsave(filename = "02_lab/plots/estebanlp_p3.pdf")
 
 # Answer: The causality is likely to go higher college educated -> higher income. However this is not always true as you can see there is high variation around the mean.
 
-# [Bonus: 10 extra points]: Investigate (on the internet) how to add a title,a subtitle and a caption to your last plot. Create a new plot with that and save it as 'githubusername_p_extra.pdf'
+# Investigate (on the internet) how to add a title,a subtitle and a caption to your last plot. Create a new plot with that and save it as 'githubusername_p_extra.pdf'
 
 ggplot(data = sa_opportunities, aes(x=frac_coll_plus2000,y=hhinc_mean2000)) +
   geom_point()+
